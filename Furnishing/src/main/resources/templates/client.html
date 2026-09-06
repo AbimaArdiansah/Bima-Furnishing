@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bima Furnishing - Katalog Produk</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f6f9; }
+        
+        /* Navbar Dominan Biru Tua & Abu-abu */
+        .navbar { background-color: #0f2a4a; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar .brand { font-size: 1.4em; font-weight: bold; color: #ffffff; }
+        .navbar .nav-links a { color: #d1d5db; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        .navbar .nav-links a:hover { color: #ffffff; text-decoration: underline; }
+
+        .container { padding: 30px; max-width: 1200px; margin: auto; }
+
+        /* Grid Katalog */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-top: 4px solid #0f2a4a; display: flex; flex-direction: column; }
+        .card img { width: 100%; height: 180px; object-fit: cover; background-color: #e5e7eb; }
+        .card-body { padding: 15px; flex-grow: 1; }
+        .card h3 { margin: 0 0 10px 0; color: #0f2a4a; font-size: 1.1em; }
+        .price { color: #2563eb; font-weight: bold; font-size: 1.2em; margin: 10px 0; }
+        .btn-buy { background-color: #0f2a4a; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-buy:hover { background-color: #1e3a5f; }
+
+        /* Kalkulator Pembelian */
+        .calc-box { background: white; padding: 20px; border-radius: 8px; margin-top: 40px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Khusus Client (Read-Only) -->
+    <div class="navbar">
+        <div class="brand">Bima Furnishing</div>
+        <div class="nav-links">
+            <a href="/">Semua Produk</a>
+            <a href="/?category=Sofa">Sofa</a>
+            <a href="/?category=Dining Table">Meja Makan</a>
+            <a href="/?category=Bed">Tempat Tidur</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Katalog Furnitur</h2>
+
+        <!-- Katalog Produk -->
+        <div class="grid">
+            <div class="card" th:each="f : ${furnitures}">
+                <img th:src="${f.imageUrl != null and !f.imageUrl.isEmpty() ? f.imageUrl : 'https://via.placeholder.com/300x180?text=No+Image'}" alt="Gambar Furniture">
+                <div class="card-body">
+                    <h3 th:text="${f.name}">Nama Barang</h3>
+                    <p style="color: #6b7280; font-size: 0.9em; margin: 0;">Kategori: <b th:text="${f.category}">Sofa</b></p>
+                    <p class="price">Rp <span th:text="${#numbers.formatDecimal(f.price, 0, 'COMMA', 0, 'POINT')}">0</span></p>
+                    <p style="font-size: 0.9em;">Stok Tersedia: <span th:text="${f.stock}">0</span></p>
+                    <button class="btn-buy" th:onclick="'calculateTotal(' + ${f.price} + ')'">Pilih Produk</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kalkulator Simulasi Pembelian -->
+        <div class="calc-box">
+            <h3 style="color: #0f2a4a; margin-top:0;">Kalkulator Simulasi Pembelian</h3>
+            <p style="color: #6b7280; font-size: 0.9em;">Klik "Pilih Produk" pada barang di atas untuk memilih harga.</p>
+            <label style="font-weight: 600;">Jumlah Unit: </label>
+            <input type="number" id="qty" value="1" min="1" onchange="updateCalc()" style="padding: 8px; width: 80px; margin-left: 10px; border: 1px solid #d1d5db; border-radius: 4px;">
+            <p style="font-size: 1.2em; margin-top: 15px;">Total Estimasi: <b style="color: #0f2a4a;">Rp <span id="totalDisplay">0</span></b></p>
+        </div>
+    </div>
+
+    <script>
+        let selectedPrice = 0;
+        function calculateTotal(price) {
+            selectedPrice = price;
+            updateCalc();
+        }
+        function updateCalc() {
+            let qty = document.getElementById('qty').value;
+            let total = selectedPrice * qty;
+            document.getElementById('totalDisplay').innerText = total.toLocaleString('id-ID');
+        }
+    </script>
+</body>
+</html>

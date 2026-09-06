@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bima Furnishing - Portal Sales & Admin</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f6f9; }
+        
+        /* Navbar Dominan Biru Tua & Abu-abu */
+        .navbar { background-color: #0f2a4a; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar .brand { font-size: 1.4em; font-weight: bold; color: #ffffff; }
+        .navbar .nav-links a { color: #d1d5db; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        .navbar .nav-links a:hover { color: #ffffff; text-decoration: underline; }
+
+        .container { padding: 30px; max-width: 1200px; margin: auto; }
+        .form-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-top: 4px solid #6c757d; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .form-card h3 { margin-top: 0; color: #0f2a4a; }
+        
+        input, select, button { padding: 10px; margin: 5px 0 15px 0; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px; }
+        button { background-color: #0f2a4a; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #1e3a5f; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; }
+        th { background-color: #0f2a4a; color: white; }
+        tr:nth-child(even) { background-color: #f9fafb; }
+        
+        .btn-edit { background-color: #d97706; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85em; }
+        .btn-delete { background-color: #dc2626; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85em; }
+        .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Khusus Sales / Admin (Tanpa Akses Client) -->
+    <div class="navbar">
+        <div class="brand">Bima Furnishing (Portal Admin)</div>
+        <div class="nav-links">
+            <a href="/admin">Kelola Stok</a>
+            <a href="#tabel-inventaris">Daftar Inventaris</a>
+            <a href="#">Laporan Sales</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <h3>Kelola Inventaris Furnitur (CRUD)</h3>
+            <form th:action="@{/admin/save}" th:object="${furniture}" method="post">
+                <input type="hidden" th:field="*{id}">
+                
+                <label>Nama Barang:</label>
+                <input type="text" th:field="*{name}" required>
+                
+                <label>Kategori:</label>
+                <select th:field="*{category}">
+                    <option value="Sofa">Sofa</option>
+                    <option value="Dining Table">Dining Table</option>
+                    <option value="Bed">Bed</option>
+                </select>
+                
+                <label>Harga (Rp):</label>
+                <input type="number" step="1000" th:field="*{price}" required>
+                
+                <label>Stok:</label>
+                <input type="number" th:field="*{stock}" required>
+                
+                <label>URL Gambar:</label>
+                <input type="text" th:field="*{imageUrl}" placeholder="Link gambar (URL)">
+                
+                <button type="submit">Simpan Furnitur</button>
+            </form>
+        </div>
+
+        <h3 id="tabel-inventaris" style="color: #0f2a4a;">Daftar Inventaris Toko</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Gambar</th>
+                    <th>Nama</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="f : ${furnitures}">
+                    <td>
+                        <img class="img-thumb" th:src="${f.imageUrl != null and !f.imageUrl.isEmpty() ? f.imageUrl : 'https://via.placeholder.com/50'}" alt="Thumb">
+                    </td>
+                    <td th:text="${f.name}">Sofa</td>
+                    <td th:text="${f.category}">Sofa</td>
+                    <td th:text="'Rp ' + ${#numbers.formatDecimal(f.price, 0, 'COMMA', 0, 'POINT')}">Rp 0</td>
+                    <td th:text="${f.stock}">10</td>
+                    <td>
+                        <a th:href="@{/admin/edit/{id}(id=${f.id})}" class="btn-edit">Edit</a>
+                        <a th:href="@{/admin/delete/{id}(id=${f.id})}" class="btn-delete" onclick="return confirm('Hapus data ini?')">Hapus</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
